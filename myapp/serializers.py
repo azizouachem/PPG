@@ -54,7 +54,7 @@ class SousCategorieSerializer(serializers.ModelSerializer):
         fields = ['id', 'nom', 'categorie']
 
 class AnnonceSerializer(serializers.ModelSerializer):
-    
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Annonce
         fields = [

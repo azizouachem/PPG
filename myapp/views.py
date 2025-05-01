@@ -83,7 +83,7 @@ class ResetPasswordView(generics.GenericAPIView):
 
 class AnnonceCreateView(APIView):
     serializer_class = AnnonceSerializer
-
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         return Response({"message": "Utilisez POST pour créer une annonce."})
 
@@ -91,8 +91,8 @@ class AnnonceCreateView(APIView):
         print("Données reçues :", request.data)  # Affiche les données reçues
         serializer = AnnonceSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            print("Données validées :", serializer.validated_data)  # Affiche les données validées
-            annonce = serializer.save()
+            # Passez l'utilisateur connecté au serializer
+            annonce = serializer.save(user=request.user)
             print("Annonce créée :", annonce)  # Affiche l'objet créé
             return Response(AnnonceSerializer(annonce).data, status=status.HTTP_201_CREATED)
         print("Erreurs de validation :", serializer.errors)  # Affiche les erreurs de validation
