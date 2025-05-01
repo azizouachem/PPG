@@ -2,7 +2,15 @@ from django.urls import path
 from .views import RegisterView,AnnonceCreateView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from myapp.views import RegisterView,LoginView,DashboadView,ResetPasswordView,  AnnonceCreateView,CategorieCreateView, SousCategorieCreateView
+from rest_framework.routers import DefaultRouter
+from .views import AnnonceViewSet
 
+router = DefaultRouter()
+router.register(r'annonces', AnnonceViewSet, basename='annonce')
+
+urlpatterns = [
+ path('annonce/ajouter/', AnnonceCreateView.as_view(), name='ajouter_annonce'),
+ ] + router.urls
 
 urlpatterns = [
     path('auth/register/',RegisterView.as_view(),name="auth_register"),

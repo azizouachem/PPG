@@ -36,23 +36,21 @@ class SousCategorie(models.Model):
 # ANNONCE
 # -----------------------------------------------------
 class Annonce(models.Model):
-    STATUS_CHOICES = (
-        ('active', 'Active'),
-        ('expiree', 'Expirée'),
-        ('supprimee', 'Supprimée'),
-    )
-
+    user = models.ForeignKey(Utilisateur, related_name='annonces', on_delete=models.CASCADE)
     titre = models.CharField(max_length=255)
     description = models.TextField()
     prix = models.FloatField()
     date_publication = models.DateTimeField(auto_now_add=True)
-    statut = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    statut = models.CharField(max_length=10, choices=[
+        ('active', 'Active'),
+        ('expiree', 'Expirée'),
+        ('supprimee', 'Supprimée'),
+    ], default='active')
     ville = models.CharField(max_length=100)
     gouvernorat = models.CharField(max_length=100)
     images_urls = models.JSONField(default=list)
     is_premium = models.BooleanField(default=False)
-    User = models.ForeignKey(Utilisateur, related_name='annonces', on_delete=models.CASCADE)
-    sous_categorie = models.ForeignKey(SousCategorie, on_delete=models.CASCADE)
+    sous_categorie = models.CharField(max_length=100)
 
     def __str__(self):
         return self.titre

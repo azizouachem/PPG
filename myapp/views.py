@@ -9,6 +9,25 @@ from .serializers import AnnonceSerializer,LoginSerializer ,UtilisateurSerialize
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import viewsets
+from .models import Annonce
+from .serializers import AnnonceSerializer
+
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import PermissionDenied
+
+class AnnonceViewSet(viewsets.ModelViewSet):
+    queryset = Annonce.objects.all()
+    serializer_class = AnnonceSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in ['PUT', 'PATCH', 'DELETE'] and obj.user != request.user:
+            raise PermissionDenied("Vous n'êtes pas autorisé à modifier cette annonce.")
+        return True
 
 class RegisterView(generics.CreateAPIView):
     queryset = Utilisateur.objects.all()
@@ -49,15 +68,7 @@ class DashboadView(APIView):
             'user' : user_serializer.data
         }, 200)
     
-class AnnonceCreateView(APIView):
-    #permission_classes = [IsAuthenticated]  
 
-    def post(self, request):
-        serializer = AnnonceSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(vendeur=request.user) 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ResetPasswordView(generics.GenericAPIView):
     serializer_class = ResetPasswordSerializer
@@ -71,14 +82,20 @@ class ResetPasswordView(generics.GenericAPIView):
         return Response(serializer.errors, status=400)
 
 class AnnonceCreateView(APIView):
+    serializer_class = AnnonceSerializer
+
     def get(self, request):
         return Response({"message": "Utilisez POST pour créer une annonce."})
 
     def post(self, request):
+        print("Données reçues :", request.data)  # Affiche les données reçues
         serializer = AnnonceSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
+            print("Données validées :", serializer.validated_data)  # Affiche les données validées
             annonce = serializer.save()
+            print("Annonce créée :", annonce)  # Affiche l'objet créé
             return Response(AnnonceSerializer(annonce).data, status=status.HTTP_201_CREATED)
+        print("Erreurs de validation :", serializer.errors)  # Affiche les erreurs de validation
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
