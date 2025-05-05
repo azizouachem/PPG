@@ -93,6 +93,12 @@ class AnnonceCreateView(APIView):
             return Response(AnnonceSerializer(annonce).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class AnnoncesParCategorieView(APIView):
+    def get(self, request, categorie_id):
+        annonces = Annonce.objects.filter(sous_categorie__categorie__id=categorie_id)
+        serializer = AnnonceSerializer(annonces, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class CategorieCreateView(generics.CreateAPIView):
     queryset = Categorie.objects.all()
@@ -133,3 +139,10 @@ class SousCategorieDeleteView(generics.DestroyAPIView):
     queryset = SousCategorie.objects.all()
     serializer_class = SousCategorieSerializer
     permission_classes = [AllowAny]
+
+#une méthode pour filtrer les sous-catégories par catégorie(à utiliser pour ajouter une annonce)
+class SousCategoriesParCategorie(APIView):
+    def get(self, request, categorie_id):
+        sous_categories = SousCategorie.objects.filter(categorie_id=categorie_id)
+        serializer = SousCategorieSerializer(sous_categories, many=True)
+        return Response(serializer.data)
