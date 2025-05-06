@@ -11,6 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import ListAPIView
 
 class RegisterView(generics.CreateAPIView):
     queryset = Utilisateur.objects.all()
@@ -75,6 +76,11 @@ class AnnonceViewSet(viewsets.ModelViewSet):
         if request.method in ['PUT', 'PATCH', 'DELETE'] and obj.user != request.user:
             raise PermissionDenied("Vous n'êtes pas autorisé à modifier cette annonce.")
         return True
+
+class AnnonceListView(ListAPIView):
+    queryset = Annonce.objects.all()
+    serializer_class = AnnonceSerializer
+    permission_classes = [AllowAny]
 
 class AnnonceCreateView(APIView):
     permission_classes = [IsAuthenticated]
