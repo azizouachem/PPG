@@ -15,6 +15,7 @@ urlpatterns = [
     path('annonce/ajouter/', AnnonceCreateView.as_view(), name='ajouter_annonce'),
     path('annonces/', AnnonceListView.as_view(), name='annonce-list'),
     path('annonces/categorie/<int:categorie_id>/', AnnoncesParCategorieView.as_view(), name='annonces-par-categorie'),
+    path('annonces/filter/', FilteredAnnoncesView.as_view(), name='filtered-annonces'),
 
     # Catégorie CRUD
     path('categorie/ajouter/', CategorieCreateView.as_view(), name='ajouter_categorie'),
@@ -28,5 +29,10 @@ urlpatterns = [
     path('sous-categorie/modifier/<int:pk>/', SousCategorieUpdateView.as_view(), name='modifier_sous_categorie'),
     path('sous-categorie/supprimer/<int:pk>/', SousCategorieDeleteView.as_view(), name='supprimer_sous_categorie'),
     path('api/sous-categories/<int:categorie_id>/', SousCategoriesParCategorie.as_view(), name='sous-categories-par-categorie'),
+
+    #panier
+    path('panier/ajouter/<int:annonce_id>/', AjouterAnnonceAuPanierView.as_view(), name='ajouter_au_panier'),
+    path('panier/', PanierDetailView.as_view(), name='afficher_panier'),
+
 
 ]

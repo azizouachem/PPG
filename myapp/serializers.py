@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Utilisateur,Annonce, Categorie, SousCategorie
+from .models import Utilisateur,Annonce, Categorie, SousCategorie,Panier
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UtilisateurSerializer(serializers.ModelSerializer):
@@ -55,7 +55,7 @@ class SousCategorieSerializer(serializers.ModelSerializer):
 
 
 class AnnonceSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)  # Utilisateur lié à l'annonce
+    user = serializers.PrimaryKeyRelatedField(read_only=True)  
 
     class Meta:
         model = Annonce
@@ -69,11 +69,26 @@ class AnnonceSerializer(serializers.ModelSerializer):
             'prix': {'required': True},
             'ville': {'required': True},
             'gouvernorat': {'required': True},
-            'images_urls': {'required': False},  # Facultatif
+            'images_urls': {'required': False},
             'sous_categorie': {'required': True},
         }
 
     def create(self, validated_data):
-        # Utilise l'utilisateur de la requête dans le contexte
         user = self.context['request'].user
         return Annonce.objects.create(user=user, **validated_data)
+
+
+    
+class PanierSerializer(serializers.ModelSerializer):
+    acheteur = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Panier
+        fields = ['id', 'acheteur', 'date_creation', 'statut']
+        read_only_fields = ['id', 'acheteur', 'date_creation']
+
+
+class AnnoncePanierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Annonce
+        fields = ['id', 'titre', 'prix', 'ville', 'statut']
